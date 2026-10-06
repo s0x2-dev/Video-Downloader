@@ -29,6 +29,32 @@ const QUALITY_FORMATS = {
     audio: "ba/b",
 };
 
+// Extra yt-dlp network options, configurable through environment variables:
+//   YTDLP_PROXY=http://127.0.0.1:8080 (or socks5://127.0.0.1:1080)
+//   YTDLP_COOKIES_BROWSER=chrome (chrome, firefox, edge, ...)
+//   YTDLP_COOKIES_FILE=C:\path\cookies.txt
+//   YTDLP_IMPERSONATE=chrome (needs: pip install "yt-dlp[curl-cffi]")
+//   YTDLP_FORCE_IPV4=1
+export function networkArgs() {
+    const args = ["--retries", "5", "--fragment-retries", "5", "--socket-timeout", "20"];
+    if (process.env.YTDLP_PROXY) {
+        args.push("--proxy", process.env.YTDLP_PROXY);
+    };
+    if (process.env.YTDLP_COOKIES_BROWSER) {
+        args.push("--cookies-from-browser", process.env.YTDLP_COOKIES_BROWSER);
+    }
+    if (process.env.YTDLP_COOKIES_FILE) {
+        args.push("--cookies", process.env.YTDLP_COOKIES_FILE);
+    }
+    if (process.env.YTDLP_IMPERSONATE) {
+        args.push("--impersonate", process.env.YTDLP_IMPERSONATE);
+    }
+    if (process.env.YTDLP_FORCE_IPV4 === "1") {
+        args.push("--force-ipv4");
+    }
+    return args;
+}
+
 export function resolveFormat(quality) {
     return QUALITY_FORMATS[quality] || QUALITY_FORMATS.best;
 }
